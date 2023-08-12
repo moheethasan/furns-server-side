@@ -27,6 +27,19 @@ async function run() {
 
     //create collection
     const productsCollection = client.db("furnsDB").collection("products");
+    const usersCollection = client.db("furnsDB").collection("users");
+
+    // users related api
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const query = { email: user.email };
+      const existingUser = await usersCollection.findOne(query);
+      if (existingUser) {
+        return res.send({ message: "user already exists" });
+      }
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
 
     // products related api
     app.get("/products", async (req, res) => {
