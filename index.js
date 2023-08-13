@@ -31,6 +31,26 @@ async function run() {
     const purchasesCollection = client.db("furnsDB").collection("purchases");
 
     // users related api
+    app.get("/users/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      const result = { admin: user?.role === "admin" };
+      res.send(result);
+    });
+
+    app.get("/users", async (req, res) => {
+      const result = await usersCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await usersCollection.findOne(query);
+      res.send(result);
+    });
+
     app.post("/users", async (req, res) => {
       const user = req.body;
       const query = { email: user.email };
@@ -55,10 +75,22 @@ async function run() {
       res.send(result);
     });
 
+    app.post("/products", async (req, res) => {
+      const body = req.body;
+      const result = await productsCollection.insertOne(body);
+      res.send(result);
+    });
+
     // purchase related api
     app.get("/purchases/bookmarked", async (req, res) => {
       const email = req.query.email;
       const query = { user_email: email, payment_status: "bookmarked" };
+      const result = await purchasesCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.get("/purchases/purchased", async (req, res) => {
+      const query = { payment_status: "purchased" };
       const result = await purchasesCollection.find(query).toArray();
       res.send(result);
     });
