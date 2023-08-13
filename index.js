@@ -56,9 +56,41 @@ async function run() {
     });
 
     // purchase related api
+    app.get("/purchases/bookmarked", async (req, res) => {
+      const email = req.query.email;
+      const query = { user_email: email, payment_status: "bookmarked" };
+      const result = await purchasesCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.get("/purchases/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await purchasesCollection.findOne(query);
+      res.send(result);
+    });
+
     app.post("/purchases", async (req, res) => {
       const body = req.body;
       const result = await purchasesCollection.insertOne(body);
+      res.send(result);
+    });
+
+    app.patch("/purchases/:id", async (req, res) => {
+      const id = req.params.id;
+      const body = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: body,
+      };
+      const result = await purchasesCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    app.delete("/purchases/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await purchasesCollection.deleteOne(query);
       res.send(result);
     });
 
