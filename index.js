@@ -31,6 +31,21 @@ async function run() {
     const purchasesCollection = client.db("furnsDB").collection("purchases");
 
     // users related api
+    // get all users
+    app.get("/users", async (req, res) => {
+      const result = await usersCollection.find().toArray();
+      res.send(result);
+    });
+
+    // get specific user
+    app.get("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await usersCollection.findOne(query);
+      res.send(result);
+    });
+
+    // get admin
     app.get("/users/admin/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
@@ -39,18 +54,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/users", async (req, res) => {
-      const result = await usersCollection.find().toArray();
-      res.send(result);
-    });
-
-    app.get("/users/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await usersCollection.findOne(query);
-      res.send(result);
-    });
-
+    // post user
     app.post("/users", async (req, res) => {
       const user = req.body;
       const query = { email: user.email };
@@ -63,11 +67,13 @@ async function run() {
     });
 
     // products related api
+    // get all product
     app.get("/products", async (req, res) => {
       const result = await productsCollection.find().toArray();
       res.send(result);
     });
 
+    // get specific product
     app.get("/products/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -75,6 +81,7 @@ async function run() {
       res.send(result);
     });
 
+    // post product
     app.post("/products", async (req, res) => {
       const body = req.body;
       const result = await productsCollection.insertOne(body);
@@ -82,6 +89,7 @@ async function run() {
     });
 
     // purchase related api
+    // get bookmarked products
     app.get("/purchases/bookmarked", async (req, res) => {
       const email = req.query.email;
       const query = { user_email: email, payment_status: "bookmarked" };
@@ -89,12 +97,14 @@ async function run() {
       res.send(result);
     });
 
+    // get purchased products
     app.get("/purchases/purchased", async (req, res) => {
       const query = { payment_status: "purchased" };
       const result = await purchasesCollection.find(query).toArray();
       res.send(result);
     });
 
+    // get specific purchase product
     app.get("/purchases/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -102,12 +112,14 @@ async function run() {
       res.send(result);
     });
 
+    // post purchase
     app.post("/purchases", async (req, res) => {
       const body = req.body;
       const result = await purchasesCollection.insertOne(body);
       res.send(result);
     });
 
+    // update purchase
     app.patch("/purchases/:id", async (req, res) => {
       const id = req.params.id;
       const body = req.body;
@@ -119,6 +131,7 @@ async function run() {
       res.send(result);
     });
 
+    // delete product
     app.delete("/purchases/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
