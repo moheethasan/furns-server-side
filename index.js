@@ -25,9 +25,10 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     client.connect();
 
-    //create collection
+    // create collections here
     const productsCollection = client.db("furnsDB").collection("products");
     const usersCollection = client.db("furnsDB").collection("users");
+    const purchasesCollection = client.db("furnsDB").collection("purchases");
 
     // users related api
     app.post("/users", async (req, res) => {
@@ -44,6 +45,20 @@ async function run() {
     // products related api
     app.get("/products", async (req, res) => {
       const result = await productsCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await productsCollection.findOne(query);
+      res.send(result);
+    });
+
+    // purchase related api
+    app.post("/purchases", async (req, res) => {
+      const body = req.body;
+      const result = await purchasesCollection.insertOne(body);
       res.send(result);
     });
 
